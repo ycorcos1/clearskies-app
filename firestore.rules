@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/students/$(request.auth.uid)).data;
+    }
+
+    function isInstructor() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
+        getUserDoc().role == "instructor";
+    }
+
+    function isStudent() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
+        getUserDoc().role == "student";
+    }
+
+    match /students/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /bookings/{bookingId} {
+      // Allow read for single documents
+      allow get: if isStudent() && resource.data.studentId == request.auth.uid;
+      allow get: if isInstructor() && resource.data.assignedInstructor == request.auth.uid;
+      
+      // Allow list queries - queries must filter by studentId or assignedInstructor
+      // The query filter ensures users only see their own bookings
+      allow list: if isStudent();
+      allow list: if isInstructor();
+
+      allow create, update: if isStudent() &&
+        request.resource.data.studentId == request.auth.uid;
+
+      allow update: if isInstructor() &&
+        resource.data.assignedInstructor == request.auth.uid;
+
+      // Allow students to delete their own demo bookings
+      allow delete: if isStudent() &&
+        resource.data.studentId == request.auth.uid &&
+        resource.data.demo == true;
+
+      match /aiReschedules/{rescheduleId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
+    }
+
+    match /notificationEvents/{eventId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Allow users to update their own notifications (e.g., mark as read)
+      allow update: if isAuthenticated() && 
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid &&
+        // Ensure all other fields remain unchanged
+        request.resource.data.bookingId == resource.data.bookingId &&
+        request.resource.data.type == resource.data.type &&
+        request.resource.data.message == resource.data.message;
+      // Cloud Functions can create notifications
+      allow create: if false;
+      allow delete: if false;
+    }
+
+    match /notificationQueue/{queueId} {
+      allow read, write: if false;
+    }
+  }
+}

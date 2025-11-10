@@ -1,0 +1,60 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky gradient background circle -->
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#56CCF2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2C82C9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD93D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main icon circle with gradient -->
+  <circle cx="30" cy="30" r="24" fill="url(#skyGradient)"/>
+  
+  <!-- Sun in top right -->
+  <circle cx="36" cy="20" r="6" fill="url(#sunGradient)"/>
+  <circle cx="36" cy="20" r="4" fill="#FFE573"/>
+  
+  <!-- Stylized airplane path (curved contrail) -->
+  <path d="M 15 35 Q 22 28, 30 28 T 45 32" 
+        stroke="white" 
+        stroke-width="2.5" 
+        stroke-linecap="round"
+        fill="none"
+        opacity="0.9"/>
+  
+  <!-- Airplane silhouette -->
+  <g transform="translate(42, 30)">
+    <!-- Fuselage -->
+    <path d="M 0 0 L 8 0 L 9 1 L 8 2 L 0 2 Z" fill="white"/>
+    <!-- Wings -->
+    <path d="M 3 0 L 3 -4 L 4 -4 L 4 0" fill="white"/>
+    <path d="M 3 2 L 3 6 L 4 6 L 4 2" fill="white"/>
+    <!-- Tail -->
+    <path d="M 0 0 L -1 -2 L 0 -2 Z" fill="white"/>
+    <path d="M 0 2 L -1 4 L 0 4 Z" fill="white"/>
+  </g>
+  
+  <!-- Cloud accent (bottom left) -->
+  <g opacity="0.3">
+    <circle cx="16" cy="42" r="3" fill="white"/>
+    <circle cx="20" cy="42" r="3.5" fill="white"/>
+    <circle cx="24" cy="42" r="3" fill="white"/>
+  </g>
+  
+  <!-- Text: ClearSkies -->
+  <text x="62" y="25" font-family="Inter, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#1A1A1A">
+    Clear
+  </text>
+  <text x="62" y="43" font-family="Inter, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#2C82C9">
+    Skies
+  </text>
+  
+  <!-- Tagline -->
+  <text x="62" y="54" font-family="Inter, -apple-system, sans-serif" font-size="7" font-weight="400" fill="#6B7280" letter-spacing="0.5">
+    WEATHER INTELLIGENCE
+  </text>
+</svg>
