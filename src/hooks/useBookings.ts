@@ -14,6 +14,7 @@ import {
 
 import type { FlightBooking } from "../data/types";
 import { db } from "../lib/firebaseConfig";
+import { convertMeridiemTimeTo24Hour } from "../utils/format";
 
 interface DashboardBookingsState {
   upcoming: FlightBooking[];
@@ -30,6 +31,35 @@ const deserializeBooking = (doc: QueryDocumentSnapshot): FlightBooking => {
     ...data,
     id: doc.id,
   };
+};
+
+const sortBookingsByDateTime = (bookings: FlightBooking[]): FlightBooking[] => {
+  return [...bookings].sort((a, b) => {
+    // First sort by date
+    if (a.scheduledDate && b.scheduledDate) {
+      const dateCompare = a.scheduledDate.localeCompare(b.scheduledDate);
+      if (dateCompare !== 0) {
+        return dateCompare;
+      }
+    } else if (a.scheduledDate) {
+      return -1;
+    } else if (b.scheduledDate) {
+      return 1;
+    }
+
+    // If dates are equal (or both missing), sort by time
+    if (a.scheduledTime && b.scheduledTime) {
+      const timeA = convertMeridiemTimeTo24Hour(a.scheduledTime);
+      const timeB = convertMeridiemTimeTo24Hour(b.scheduledTime);
+      return timeA.localeCompare(timeB);
+    } else if (a.scheduledTime) {
+      return -1;
+    } else if (b.scheduledTime) {
+      return 1;
+    }
+
+    return 0;
+  });
 };
 
 const buildUpcomingQuery = (
@@ -140,7 +170,8 @@ export const useDashboardBookings = (
           role: normalizedRole,
           count: snapshot.docs.length,
         });
-        setUpcoming(snapshot.docs.map(deserializeBooking));
+        const bookings = snapshot.docs.map(deserializeBooking);
+        setUpcoming(sortBookingsByDateTime(bookings));
         pendingUpcoming = false;
         if (!pendingAlerts) {
           setLoading(false);
@@ -167,7 +198,8 @@ export const useDashboardBookings = (
           role: normalizedRole,
           count: snapshot.docs.length,
         });
-        setAlerts(snapshot.docs.map(deserializeBooking));
+        const bookings = snapshot.docs.map(deserializeBooking);
+        setAlerts(sortBookingsByDateTime(bookings));
         pendingAlerts = false;
         if (!pendingUpcoming) {
           setLoading(false);

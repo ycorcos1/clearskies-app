@@ -38,9 +38,10 @@ export interface FlightBookingRecord {
   scheduledTime?: string;
   departureLocation?: DepartureLocation;
   status?: "scheduled" | "cancelled" | "completed";
-  weatherStatus?: "safe" | "caution" | "unsafe";
+  weatherStatus?: "safe" | "caution" | "unsafe" | null;
   demo?: boolean;
   demoWeather?: WeatherSnapshot;
+  lastWeatherCheck?: Timestamp;
   lastModified?: Timestamp;
   cancelledBy?: string;
   cancelledAt?: Timestamp;

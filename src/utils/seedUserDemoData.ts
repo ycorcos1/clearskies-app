@@ -137,11 +137,11 @@ const demoWeatherTemplates: Record<
 > = {
   safeClear: {
     visibilityMiles: 8,
-    windKts: 6,
-    gustKts: 9,
+    windKts: 6.0, // Match WeatherAPI precision (1 decimal place)
+    gustKts: 9.0, // Match WeatherAPI precision (1 decimal place)
     cloudPercent: 20,
     tempC: 18,
-    conditionText: "Clear skies",
+    conditionText: "Clear",
     hazards: {
       hasThunderstorm: false,
       hasFog: false,
@@ -152,11 +152,11 @@ const demoWeatherTemplates: Record<
   },
   breezyCaution: {
     visibilityMiles: 6.8,
-    windKts: 8,
-    gustKts: 16,
+    windKts: 8.0, // Match WeatherAPI precision
+    gustKts: 16.0, // Match WeatherAPI precision
     cloudPercent: 28,
     tempC: 17,
-    conditionText: "Breezy with scattered clouds",
+    conditionText: "Partly cloudy",
     hazards: {
       hasThunderstorm: false,
       hasFog: false,
@@ -167,11 +167,11 @@ const demoWeatherTemplates: Record<
   },
   lowVisibilityUnsafe: {
     visibilityMiles: 2.4,
-    windKts: 8,
-    gustKts: 12,
+    windKts: 8.0, // Match WeatherAPI precision
+    gustKts: 12.0, // Match WeatherAPI precision
     cloudPercent: 35,
     tempC: 12,
-    conditionText: "Morning marine layer",
+    conditionText: "Fog",
     hazards: {
       hasThunderstorm: false,
       hasFog: true,
@@ -182,11 +182,11 @@ const demoWeatherTemplates: Record<
   },
   thunderstormUnsafe: {
     visibilityMiles: 5.5,
-    windKts: 14,
-    gustKts: 24,
+    windKts: 14.0, // Match WeatherAPI precision
+    gustKts: 24.0, // Match WeatherAPI precision
     cloudPercent: 68,
     tempC: 19,
-    conditionText: "Thunderstorms nearby",
+    conditionText: "Thunderstorm",
     hazards: {
       hasThunderstorm: true,
       hasFog: false,

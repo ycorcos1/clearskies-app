@@ -952,14 +952,108 @@ export const confirmReschedule = functions
       );
     }
 
-    try {
-      await bookingSnap.ref.update({
-        scheduledDate: newDate,
-        scheduledTime: newTime,
-        weatherStatus: null,
-        lastWeatherCheck: null,
-        lastModified: admin.firestore.FieldValue.serverTimestamp(),
+    const isDemoBooking = Boolean(bookingData.demo);
+    const departure = bookingData.departureLocation;
+    const hasCoordinates =
+      departure &&
+      Number.isFinite(departure.lat) &&
+      Number.isFinite(departure.lon);
+
+    // Resolve training level for evaluation
+    const resolveTrainingLevel = createTrainingLevelResolver();
+    const trainingLevel = isTrainingLevel(bookingData.trainingLevel)
+      ? bookingData.trainingLevel
+      : await resolveTrainingLevel(bookingData.studentId);
+
+    let weatherStatus: "safe" | "caution" | "unsafe" | null = null;
+    let weatherSnapshot: WeatherSnapshot | undefined = undefined;
+
+    // Get weather data (same logic for both demo and real bookings)
+    if (isDemoBooking) {
+      // For demo bookings, create a "good" weather snapshot that matches WeatherAPI format exactly
+      // This represents the AI's suggestion that the rescheduled time has better weather
+      weatherSnapshot = {
+        visibilityMiles: 8,
+        windKts: 6.0, // Match WeatherAPI precision (1 decimal place)
+        gustKts: 9.0, // Match WeatherAPI precision (1 decimal place)
+        cloudPercent: 20,
+        tempC: 18,
+        conditionText: "Clear",
+        hazards: {
+          hasThunderstorm: false,
+          hasFog: false,
+          hasPrecipitation: false,
+          icingRisk: false,
+        },
+        observedAt: new Date().toISOString(),
+        provider: "demo",
+      };
+    } else if (hasCoordinates) {
+      // For real bookings, fetch actual weather for the new date/time
+      try {
+        weatherSnapshot = await getWeatherData(departure.lat, departure.lon);
+      } catch (error) {
+        await logError({
+          type: "weather_api",
+          message: "Failed to fetch weather for rescheduled flight",
+          bookingId,
+          studentId: bookingData.studentId,
+          cause: error,
+        });
+        // Continue with weatherStatus = null if fetch fails
+        logger.warn(
+          "Weather fetch failed for reschedule, leaving status as null",
+          {
+            bookingId,
+            newDate,
+            newTime,
+          }
+        );
+      }
+    }
+
+    // Evaluate weather (same logic for both demo and real bookings)
+    if (weatherSnapshot) {
+      const evaluation = evaluateWeatherSafety(weatherSnapshot, trainingLevel);
+      weatherStatus = evaluation.status;
+
+      logger.info("Weather evaluated for reschedule", {
+        bookingId,
+        newDate,
+        newTime,
+        trainingLevel,
+        weatherStatus: evaluation.status,
+        violations: evaluation.violations.length,
+        visibility: weatherSnapshot.visibilityMiles,
+        wind: weatherSnapshot.windKts,
+        cloud: weatherSnapshot.cloudPercent,
+        isDemoBooking,
       });
+    }
+
+    // Update booking with new date/time and weather evaluation
+    const updateData: any = {
+      scheduledDate: newDate,
+      scheduledTime: newTime,
+      lastModified: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    if (weatherStatus !== null) {
+      updateData.weatherStatus = weatherStatus;
+      updateData.lastWeatherCheck =
+        admin.firestore.FieldValue.serverTimestamp();
+    } else {
+      updateData.weatherStatus = null;
+      updateData.lastWeatherCheck = null;
+    }
+
+    // Update demoWeather for demo bookings
+    if (isDemoBooking && weatherSnapshot) {
+      updateData.demoWeather = weatherSnapshot;
+    }
+
+    try {
+      await bookingSnap.ref.update(updateData);
     } catch (error) {
       await logError({
         type: "firestore",
@@ -1010,6 +1104,8 @@ export const confirmReschedule = functions
       studentId: bookingData.studentId,
       newDate,
       newTime,
+      weatherStatus,
+      isDemoBooking,
     });
 
     return { success: true, newDate, newTime };
