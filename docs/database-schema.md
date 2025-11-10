@@ -419,3 +419,4 @@ See `firestore.rules` for detailed security rules. Key principles:
 - Bookings are readable by the student who owns them
 - Notification queue is write-only for functions, read-only for students
 - Error logs are read-only for all authenticated users
+

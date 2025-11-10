@@ -26,3 +26,4 @@ export const cancelBooking = async (bookingId: string): Promise<void> => {
     throw new Error("Cancellation failed. Please try again.");
   }
 };
+

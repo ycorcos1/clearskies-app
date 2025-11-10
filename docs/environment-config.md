@@ -92,3 +92,4 @@ The system will log warnings but continue to function. Email notifications are o
 ⚠️ **Deprecation Warning**: `functions.config()` API is deprecated and will be removed in March 2026. Consider migrating to environment variables using `.env` files or Google Cloud Secret Manager.
 
 See: https://firebase.google.com/docs/functions/config-env#migrate-to-dotenv
+
