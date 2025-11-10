@@ -20,19 +20,19 @@ Flight schools face constant disruptions due to weather. ClearSkies solves this 
 
 ## 🚀 Tech Stack
 
-| Layer              | Technology                              |
-| ------------------ | --------------------------------------- |
+| Layer              | Technology                                    |
+| ------------------ | --------------------------------------------- |
 | **Frontend**       | Next.js 14, React 18, TypeScript, TailwindCSS |
-| **Backend**        | Firebase Functions (TypeScript, Node.js 20) |
-| **Database**       | Firebase Firestore (NoSQL)              |
-| **AI**             | OpenAI API (GPT-4o-mini)                |
-| **Weather API**    | WeatherAPI.com                          |
-| **Authentication** | Firebase Auth                           |
-| **Scheduler**      | Firebase Cloud Scheduler                |
-| **Email**          | Nodemailer (SMTP)                       |
-| **Deployment**     | Vercel (frontend) + Firebase (backend)  |
-| **Icons**          | Lucide React                            |
-| **Notifications**  | React Toastify                          |
+| **Backend**        | Firebase Functions (TypeScript, Node.js 20)   |
+| **Database**       | Firebase Firestore (NoSQL)                    |
+| **AI**             | OpenAI API (GPT-4o-mini)                      |
+| **Weather API**    | WeatherAPI.com                                |
+| **Authentication** | Firebase Auth                                 |
+| **Scheduler**      | Firebase Cloud Scheduler                      |
+| **Email**          | Nodemailer (SMTP)                             |
+| **Deployment**     | Vercel (frontend) + Firebase (backend)        |
+| **Icons**          | Lucide React                                  |
+| **Notifications**  | React Toastify                                |
 
 ---
 
@@ -333,6 +333,7 @@ firebase functions:config:set smtp.from="ClearSkies <noreply@yourdomain.com>"
 ```
 
 **For Gmail:**
+
 1. Enable 2-factor authentication
 2. Generate an "App Password" (not your regular password)
 3. Use the app password in `smtp.pass`
@@ -380,6 +381,7 @@ npm run seed:emulator
 ```
 
 This populates your Firestore database with:
+
 - Sample students (8 students with different training levels)
 - Sample flight bookings (15 bookings with various statuses)
 - Demo data for testing
@@ -424,6 +426,7 @@ npm run logs             # View function logs
 ### Frontend (Vercel)
 
 1. **Push code to GitHub**
+
    ```bash
    git add .
    git commit -m "Initial commit"
@@ -431,12 +434,14 @@ npm run logs             # View function logs
    ```
 
 2. **Connect to Vercel**
+
    - Go to [Vercel Dashboard](https://vercel.com/dashboard)
    - Click "Add New Project"
    - Import your GitHub repository
    - Vercel will auto-detect Next.js
 
 3. **Configure Environment Variables**
+
    - In Vercel project settings, add all `NEXT_PUBLIC_*` variables from `.env.local`
    - Variables needed:
      - `NEXT_PUBLIC_FIREBASE_API_KEY`
@@ -633,31 +638,38 @@ npm run serve
 ### Build Errors
 
 **Error: Cannot find module 'firebase-functions'**
+
 - **Solution:** The `functions/` directory is excluded from Next.js compilation. This is correct. Firebase Functions are deployed separately.
 
 **Error: Type error in functions directory**
+
 - **Solution:** Make sure `functions/` is in the `exclude` array in `tsconfig.json`. The functions directory has its own `tsconfig.json`.
 
 ### Firebase Errors
 
 **Error: Functions config not found**
+
 - **Solution:** Run `firebase functions:config:set` to set your API keys (see Setup section 4.6).
 
 **Error: Permission denied**
+
 - **Solution:** Make sure you're logged in with `firebase login` and have the correct project selected.
 
 **Error: Firestore rules deployment failed**
+
 - **Solution:** Check `firestore.rules` syntax. Rules must be valid.
 
 ### Deployment Errors
 
 **Error: Build failed on Vercel**
-- **Solution:** 
+
+- **Solution:**
   - Make sure all `NEXT_PUBLIC_*` environment variables are set in Vercel
   - Check that `functions/` is excluded in `tsconfig.json`
   - Verify build logs for specific errors
 
 **Error: Functions deployment failed**
+
 - **Solution:**
   - Check that all required config variables are set
   - Verify TypeScript compilation: `cd functions && npm run build`
@@ -666,15 +678,18 @@ npm run serve
 ### Runtime Errors
 
 **Email notifications not sending**
+
 - **Solution:** SMTP configuration is optional. If not configured, emails will be queued but not sent. Configure SMTP (see Setup section 4.7) or use in-app notifications only.
 
 **Weather checks not running**
-- **Solution:** 
+
+- **Solution:**
   - Verify Cloud Scheduler is set up (see Deployment section)
   - Check function logs: `firebase functions:log`
   - Verify `checkWeatherStatus` function is deployed
 
 **Authentication not working**
+
 - **Solution:**
   - Verify Firebase Auth is enabled in Firebase Console
   - Check that Email/Password provider is enabled
