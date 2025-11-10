@@ -32,7 +32,7 @@ type UserRole = "student" | "instructor";
 const LoginPageContent = () => {
   const searchParams = useSearchParams();
   const initialMode = (
-    searchParams.get("mode") === "signup" ? "signup" : "login"
+    searchParams?.get("mode") === "signup" ? "signup" : "login"
   ) as AuthMode;
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
@@ -44,6 +44,7 @@ const LoginPageContent = () => {
   const { user, loading } = useAuthUser();
 
   useEffect(() => {
+    if (!searchParams) return;
     const modeParam = searchParams.get("mode");
     if (modeParam === "signup") {
       setMode("signup");
